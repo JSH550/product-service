@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+`<html xmlns:th="http://www.thymeleaf.org">`<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원 첫 페이지</title>
+</head>
+<body>
+
+<h3>회원 첫 페이지</h3>
+
+<div>
+    <a th:href="@{/members/new}">회원가입</a>
+</div>
+
+<div>
+    <a th:href="@{/members/{userId}(userId=1)}">회원정보</a>
+    <!-- userId=1 부분은 실제 유저 아이디에 맞게 변경해야 합니다. -->
+</div>
+
+</body>
+</html>
