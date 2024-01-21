@@ -5,6 +5,5 @@ import hello.productservice.main.data.entity.Member;
 
 public interface MemberService {
 
-
     MemberDto saveMember(MemberDto memberDto);
 }
