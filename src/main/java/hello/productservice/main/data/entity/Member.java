@@ -12,21 +12,31 @@ public class Member {
     @GeneratedValue(strategy = GenerationType.IDENTITY)//auto_increment 자동생성
     @Column(name = "member_id")
     private Long memberId;
+
+    //로그인 id
     private String memberName;
 
     private String memberPassword;
 
-    private String memberEmail;
+//    private String memberEmail;
+//
+//
+//    private String memberNickName;
 
-
-    private String memberNickName;
-
-    public void saveMember(String memberName, String memberEmail,String memberPassword,String memberNickName){
+    public void saveMember(String memberName,String memberPassword){
         this.memberName=memberName;
         this.memberPassword=memberPassword;
-        this.memberEmail=memberEmail;
-        this.memberNickName=memberNickName;
+//        this.memberEmail=memberEmail;
+//        this.memberNickName=memberNickName;
 
     }
+
+//    public void saveMember(String memberName, String memberEmail,String memberPassword,String memberNickName){
+//        this.memberName=memberName;
+//        this.memberPassword=memberPassword;
+//        this.memberEmail=memberEmail;
+//        this.memberNickName=memberNickName;
+//
+//    }
 
 }

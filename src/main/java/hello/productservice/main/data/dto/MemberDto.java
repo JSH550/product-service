@@ -14,7 +14,7 @@ public class MemberDto {
 
     private String memberPassword;
 
-    private String memberEmail;
-
-    private String memberNickName;
+//    private String memberEmail;
+//
+//    private String memberNickName;
 }

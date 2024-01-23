@@ -7,6 +7,8 @@ import hello.productservice.main.service.MemberService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class MemberServiceImpl implements MemberService {
     private final MemberRepository memberRepository;
@@ -20,20 +22,43 @@ public class MemberServiceImpl implements MemberService {
     public MemberDto saveMember(MemberDto memberDto) {
         Member member = new Member();
         member.saveMember(memberDto.getMemberName(),
-                memberDto.getMemberPassword(),
-                memberDto.getMemberEmail(),
-                memberDto.getMemberNickName());
+                memberDto.getMemberPassword());
+//                memberDto.getMemberEmail(),
+//                memberDto.getMemberNickName());
         Member savedMember = memberRepository.save(member);
+        
         return convertToDto(savedMember);
     }
+
+    @Override
+    public MemberDto findMemberById(Long memberId) {
+        Optional<Member> foundMember = memberRepository.findById(memberId);
+        if(foundMember.isPresent()){
+            Member foundMemberEntity = foundMember.get();
+            return convertToDto(foundMemberEntity);
+        }else{
+
+            return null;
+        }
+    }
+
+    @Override
+    public MemberDto findMemberByName(String memberName) {
+
+        Optional<Member> foundByName = memberRepository.findByMemberName(memberName);
+        return convertToDto(foundByName.get());
+    }
+
+    ;
+
 
     private MemberDto convertToDto(Member member) {
         MemberDto memberDto = new MemberDto();
         memberDto.setMemberId(member.getMemberId());
         memberDto.setMemberName(member.getMemberName());
         memberDto.setMemberPassword(member.getMemberPassword());
-        memberDto.setMemberEmail(member.getMemberEmail());
-        memberDto.setMemberNickName(member.getMemberNickName());
+//        memberDto.setMemberEmail(member.getMemberEmail());
+//        memberDto.setMemberNickName(member.getMemberNickName());
         return memberDto;
     }
 }
