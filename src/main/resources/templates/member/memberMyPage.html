@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입</title>
+</head>
+<body>
+<div>
+    <h2>Welcome!</h2>
+    <p><span th:text="${member.memberName}">No Member ID</span> 님 환영합니다!</p>
+</div>
+
+<div>
+    <h3>상품 관리</h3>
+    <!-- 상품 관리 부분 -->
+    <!-- TODO: 상품 관리 UI 작성 -->
+</div>
+
+<div>
+    <h3>로그아웃</h3>
+    <!-- 로그아웃 부분 -->
+    <!-- TODO: 로그아웃 UI 작성 -->
+    <a th:href="@{/members/logout}" >Logout </a>
+
+</div>
+<script>
+    function logout(){
+    deleteCookie('memberId')
+    window.location.href = '/';
+    }
+
+    const deleteCookie = (cookieName)=>{
+    document.cookie = cookieName + "=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;"}
+
+</script>
+</body>
+</html>
