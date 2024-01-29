@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>상품 리스트</title>
+</head>
+<body>
+<!-- 페이지 제목 -->
+<div>
+    <h2>상품 리스트</h2>
+</div>
+
+<!-- 상품 목록 테이블 -->
+<h2>Product List</h2>
+<table border="1">
+    <thead>
+    <!-- 테이블 헤더 -->
+    <tr>
+        <th>상품명</th>
+        <th>상품가격</th>
+        <th>상품갯수</th>
+    </tr>
+    </thead>
+    <tbody>
+    <!-- Product 리스트를 순회하면서 각 상품 정보를 표시 -->
+    <tr th:each="product : ${productList}">
+        <!-- 상품명 -->
+        <td th:text="${product.productName} ?: '상품예시'"></td>
+        <!-- 상품가격 -->
+        <td th:text="${product.productPrice} ?: '10000'"></td>
+        <!-- 상품갯수 -->
+        <td th:text="${product.productQuantity} ?: '2'"></td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>
