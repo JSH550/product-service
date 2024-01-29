@@ -31,7 +31,7 @@ public class ProductServiceImpl implements ProductService {
         boolean isProductExist = productRepository.existsByProductName(productDto.getProductName());
         log.info("ExistResult={}",isProductExist);
         if (isProductExist){
-            throw new IllegalArgumentException("이미 등록된 상품명입니다.");
+            throw new IllegalArgumentException("이미 등록된 상품명입니다. 다른 상품명을 입력해주세요");
         }
 
         Product product = new Product();
