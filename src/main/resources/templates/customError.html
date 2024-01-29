@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Error</title>
+</head>
+<body>
+<h1>Error</h1>
+<p th:text="${customErrorMessage}">Error Message</p>
+
+<button onclick="goBack()">Go Back</button>
+
+
+<script>
+        // JavaScript 함수 정의: 이전 페이지로 리다이렉트
+        function goBack() {
+            // 브라우저의 뒤로 가기 기능을 사용하여 이전 페이지로 이동
+            window.history.back();
+        }
+    </script>
+</body>
+</html>
