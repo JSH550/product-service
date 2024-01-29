@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -41,18 +42,20 @@ public class MemberServiceImpl implements MemberService {
             return convertToDto(foundMemberEntity);
         }else{
 
-            return null;
+            throw new NoSuchElementException("Member not found with ID: " + memberId);
         }
     }
 
     @Override
     public MemberDto findMemberByName(String memberName) {
 
-        Optional<Member> foundByName = memberRepository.findByMemberName(memberName);
-        return convertToDto(foundByName.get());
-    }
-
-    ;
+        Optional<Member> foundMemberByName = memberRepository.findByMemberName(memberName);
+        if(foundMemberByName.isPresent()){
+            return convertToDto(foundMemberByName.get());
+        }else{
+            throw new NoSuchElementException("Member not found with memberName: " + memberName);
+        }
+    };
 
     @Override
     public Optional<MemberDto> login(String memberName, String password) {
