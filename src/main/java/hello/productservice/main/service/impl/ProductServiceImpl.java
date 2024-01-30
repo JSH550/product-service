@@ -25,6 +25,8 @@ public class ProductServiceImpl implements ProductService {
     }
 
 
+    //TODO 이미지 업로드
+    //TODO 제조사 정보 추가
     @Override
     @Transactional
     public ProductDto saveProduct(ProductDto productDto) {
@@ -72,14 +74,37 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductDto> getAllProducts() {
+        //DB에서 검색결과 List 저장
         List<Product> foundAllProducts = productRepository.findAll();
+        //entity 값을 저장할 DTO List 객체 형성
         List<ProductDto> productDtos = new ArrayList<>();
         for (Product foundProduct : foundAllProducts)  {
             ProductDto productDto = convertToDto(foundProduct);
             productDtos.add(productDto);
         }
         return productDtos;
-    };
+    }
+
+    /*
+    검색기능
+     */
+    @Override
+    public List<ProductDto> searchProducts(String searchKeyword) {
+        //DB에서 검색결과 List 저장
+        List<Product> searchedProducts = productRepository.findByProductNameContaining(searchKeyword);
+        //entity 값을 저장할 DTO List 객체 형성
+        if(searchedProducts.isEmpty()){
+            throw new NoSuchElementException("검색 결과가 존재하지 않습니다. 검색어 :  " + searchKeyword);
+        }
+        List<ProductDto> productDtos = new ArrayList<>();
+        for(Product searchedProduct : searchedProducts ){
+            ProductDto productDto= convertToDto(searchedProduct);
+            productDtos.add(productDto);
+        }
+        return productDtos;
+    }
+
+    ;
 
 //    @Override
 //    public void deleteProductByName(String productName) {

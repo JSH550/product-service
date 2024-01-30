@@ -15,6 +15,8 @@ public interface ProductService {
 
    List<ProductDto> getAllProducts();
 
+   List<ProductDto> searchProducts(String searchKeyword);
+
 //    void deleteProductByName(String productName);
 
 }

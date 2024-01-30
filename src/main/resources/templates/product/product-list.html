@@ -3,28 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../css/main.css" rel="stylesheet">
+<!--    <link href="../css/bootstrap.min.css" rel="stylesheet">-->
+
     <title>상품 리스트</title>
 </head>
 <body>
+
+<div class="container">
 <!-- 페이지 제목 -->
-<div>
+<div class="header">
     <h2>상품 리스트</h2>
 </div>
+    <button class="button-click" onclick=redirectToPage('/products/new')> 상품등록 </button>
 
+
+    <!-- 검색창 추가 -->
+<form th:action ="@{/products/search}"
+      class="search-box">
+    <input type="text" th:name="query"/>
+    <button type="submit">
+        검색
+    </button>
+</form>
+
+    <div class="mid-menu">
 <!-- 상품 목록 테이블 -->
 <h2>Product List</h2>
-<table border="1">
+<table class="data-table">
     <thead>
     <!-- 테이블 헤더 -->
-    <tr>
+    <tr style="outline: 10px darkkhaki">
+        <th>상품ID</th>
         <th>상품명</th>
         <th>상품가격</th>
         <th>상품갯수</th>
     </tr>
     </thead>
-    <tbody>
+    <tbody style="margin-top: 100px">
     <!-- Product 리스트를 순회하면서 각 상품 정보를 표시 -->
     <tr th:each="product : ${productList}">
+
+        <!-- 상품ID -->
+        <td th:text="${product.productId} ?: '상품예시'"></td>
         <!-- 상품명 -->
         <td th:text="${product.productName} ?: '상품예시'"></td>
         <!-- 상품가격 -->
@@ -34,5 +55,20 @@
     </tr>
     </tbody>
 </table>
+    </div>
+
+</div>
 </body>
+
+<script>
+    const redirectToPage = (pageUrl) => {
+        window.location.href = pageUrl
+
+    }
+    function goBack(){
+        window.history.back
+    }
+
+
+</script>
 </html>
