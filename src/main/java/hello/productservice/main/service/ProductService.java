@@ -2,11 +2,12 @@ package hello.productservice.main.service;
 
 import hello.productservice.main.data.dto.ProductDto;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
-    ProductDto saveProduct(ProductDto productDto);
+    ProductDto saveProduct(ProductDto productDto) throws IOException;
 
     ProductDto findProductById(Long productId);
 
