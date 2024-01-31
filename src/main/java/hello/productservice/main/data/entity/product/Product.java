@@ -1,7 +1,10 @@
-package hello.productservice.main.data.entity;
+package hello.productservice.main.data.entity.product;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -17,9 +20,18 @@ public class Product {
     private double productPrice;
     private int productQuantity;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    //컬렉션을 초기화 해주지 않으면 NullPointException발생
+    private List<ProductFile> productFiles = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+    private List<ProductFile> productImages = new ArrayList<>();
+
+
     public void saveProduct(String productName, double productPrice, int productQuantity) {
         this.productName = productName;
         this.productPrice = productPrice;
         this.productQuantity = productQuantity;
+
     }
 }

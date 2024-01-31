@@ -3,6 +3,9 @@ package hello.productservice.main.data.dto;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Getter
@@ -10,8 +13,11 @@ import lombok.Setter;
 public class ProductDto {
 
     private Long productId;
-
     private String productName;
     private double productPrice;
     private int productQuantity;
+
+    private List<MultipartFile> productImages;
+    private List<MultipartFile> productFiles;
+
 }
