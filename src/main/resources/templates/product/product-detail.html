@@ -3,18 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../css/main.css" rel="stylesheet">
     <title>제품 상세 페이지</title>
 </head>
 <body>
-<div>
-    <h2>제품 상세페이지입니다.</h2>
+ <div class="container">
+
+    <h2 style="text-align: center" >제품 상세페이지입니다.</h2>
+     <div class="left-menu">
+         <P>상품사진:      <div th:each="imagePath : ${productDto.productImagesName}">
+         <img th:src="@{'/products/images/' + ${imagePath}}" alt="Product Image" width="100" height="100">
+     </div>
+         </div>
+
+    <div class="right-menu">
     <p>상품명 : <span th:text="${productDto.productName}">등록된 상품이 아닙니다. </span></p>
-    <p>상품 가격 : <span th:text="${productDto.productPrice}">등록된 상품이 아닙니다. </span>원</p>
+        <div style="outline: #0a58ca 1px">
+            <p>상품 가격 : <span th:text="${productDto.productPrice}">등록된 상품이 아닙니다. </span>원</p>
+        </div>
     <p>상품 수량 : <span th:text="${productDto.productQuantity}">등록된 상품이 아닙니다. </span></p>
 
-</div>
 
-<div>
+   </P>
+
+    </div>
+
+
+
     <h3>상품 관리</h3>
 
 </div>
