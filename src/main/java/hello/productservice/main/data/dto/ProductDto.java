@@ -17,7 +17,8 @@ public class ProductDto {
     private double productPrice;
     private int productQuantity;
 
-    private List<MultipartFile> productImages;
-    private List<MultipartFile> productFiles;
+//    private List<String> productImagesPath;
+    private List<String> productImagesName;
+        //    private List<MultipartFile> productFiles;
 
 }
