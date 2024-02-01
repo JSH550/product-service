@@ -13,7 +13,7 @@ import lombok.ToString;
 public class ProductImageDto {
 
     private Long productImageId;
-    private Product product;
+//    private Product product;
     private String productImageName;
-    private String productImagePath;
+//    private String productImagePath;
 }
