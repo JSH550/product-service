@@ -4,16 +4,25 @@ import hello.productservice.main.data.dto.ProductDto;
 import hello.productservice.main.service.ProductService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.buf.UriUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.util.UriUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -87,17 +96,20 @@ public class ProductController {
     };
     @ResponseBody
     @PostMapping("")
-    public String addNewProduct(@ModelAttribute("productDto") ProductDto productDto) throws IOException {
+    public String addNewProduct(@ModelAttribute("productDto") ProductDto productDto,
+                                @RequestParam("productImages") List<MultipartFile> productImages) {
         log.info("productName={}",productDto.getProductName());
         log.info("productPrice={}",productDto.getProductPrice());
         log.info("productQuantity={}",productDto.getProductQuantity());
-        log.info("productFiles={}",productDto.getProductFiles().isEmpty());
         log.info("업로드위치={}",uploadDirectory);
 
-        //TODO db에 파일명 저장하기
 
-            ProductDto productDto1 = productService.saveProduct(productDto);
-            return"ok";
+        try {
+            ProductDto productDto1 = productService.saveProduct(productDto,productImages);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return"ok";
 
         //DB에서 상품명으로 조회, true false 반환
         //true면 에러 반환 flase면 save 진행
@@ -111,13 +123,75 @@ public class ProductController {
 //    @ResponseBody
     @GetMapping("/{id}")
     public String showProductDetail(@PathVariable Long id
-                                    ,Model model){
-        //db에서 id로 아이템 조회
-        //상세내용 불러와주셈
+                                    ,Model model) throws MalformedURLException {
+        //db에서 id로 아이템 조회 DTO 객체로 저장
         ProductDto productById = productService.findProductById(id);
+        model.addAttribute(productById);
+        //파일 이름 확인
+        //구현1 이미지 경로자체를 productDTo에 저장 - 수정하기 힘들다, 이미지를 받아오는 서비스계층에 넘기자
+//        log.info("첫번째 파일 경로={}",productById.getProductImagesPath().get(0));
+//        log.info("첫번째 파일 경로={}",productById.getProductImagesPath().get(1));
+        log.info("첫번째 파일 경로 ={}",productById.getProductImagesName().get(0));
+        log.info("첫번째 파일 경로 ={}",productById.getProductImagesName().get(1));
+
+
+        //기능구현 1 - 첫번째 파일 이름 view에 전송
+//        UrlResource urlResource = new UrlResource("file:"+
+//                uploadDirectory + productById.getProductImagesPath().get(0));
+//        HttpHeaders headers= new HttpHeaders();
+//        if (productById.getProductImages().isEmpty()){
+//            log.info("이미지없음;");
+//        }
+
         model.addAttribute(productById);
         return "product/product-detail";
     }
+
+    @GetMapping("/images/{imageName}")
+    @ResponseBody
+    public ResponseEntity<Resource> serveProductImage(@PathVariable String imageName) throws MalformedURLException {
+        Resource productImage = productService.getProductFileByFileName(imageName);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE,MediaType.IMAGE_JPEG_VALUE)
+                .body(productImage);
+
+    };
+
+
+
+
+
+    @GetMapping("/urltest")
+    @ResponseBody
+    public ResponseEntity<Resource> img() throws MalformedURLException {
+        UrlResource urlResource = new UrlResource("file:" +
+                uploadDirectory + "79a23780-be69-46af-8634-a9dd58fba7e2_apple.jpg");
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.IMAGE_JPEG);
+        return new ResponseEntity<>(urlResource,headers,HttpStatus.OK);
+
+    }
+
+    @GetMapping("/urltest2")
+    public ResponseEntity<Resource> img2() throws MalformedURLException {
+        String fileName = "79a23780-be69-46af-8634-a9dd58fba7e2_apple.jpg";
+        UrlResource urlResource = new UrlResource("file:" +
+                uploadDirectory + fileName);
+
+        //한글 깨짐 방지 UTF_8로 인코딩
+        String encoeded = UriUtils.encode(fileName, StandardCharsets.UTF_8);
+
+        String contentDisposition = "attachment; filename=\""+
+                encoeded +"\"";
+
+        return  ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, contentDisposition)
+                .body(urlResource);
+    }
+
+
+
 
     /*/
     업로드기능 테스트
