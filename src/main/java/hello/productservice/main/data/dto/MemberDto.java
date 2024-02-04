@@ -10,6 +10,8 @@ import lombok.Setter;
 public class MemberDto {
     private Long memberId;
 
+    private String memberEmail;
+
     private String memberName;
 
     private String memberPassword;

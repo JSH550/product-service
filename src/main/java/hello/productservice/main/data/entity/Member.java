@@ -13,7 +13,10 @@ public class Member {
     @Column(name = "member_id")
     private Long memberId;
 
-    //로그인 id
+    @Column(unique = true)
+    private String memberEmail;
+
+    //이름
     private String memberName;
 
     private String memberPassword;
@@ -23,7 +26,8 @@ public class Member {
 //
 //    private String memberNickName;
 
-    public void saveMember(String memberName,String memberPassword){
+    public void saveMember(String memberEmail,String memberName,String memberPassword){
+        this.memberEmail=memberEmail;
         this.memberName=memberName;
         this.memberPassword=memberPassword;
 //        this.memberEmail=memberEmail;
