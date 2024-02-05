@@ -17,19 +17,22 @@ public class Product {
     private Long productId;
 
     private String productName;
+    private String productManufacturer;
     private double productPrice;
     private int productQuantity;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    //컬렉션을 초기화 해주지 않으면 NullPointException발생
-    private List<ProductFile> productFiles = new ArrayList<>();
+//    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
+//    //컬렉션을 초기화 해주지 않으면 NullPointException발생
+//    private List<ProductFile> productFiles = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
-    private List<ProductFile> productImages = new ArrayList<>();
+    //mappedby 는 연관관계에서 mapping되었다는 의미(읽기전용)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product",  fetch = FetchType.LAZY)
+    private List<ProductImage> productImages = new ArrayList<>();
 
 
-    public void saveProduct(String productName, double productPrice, int productQuantity) {
+    public void saveProduct(String productName,String productManufacturer, double productPrice, int productQuantity) {
         this.productName = productName;
+        this.productManufacturer = productManufacturer;
         this.productPrice = productPrice;
         this.productQuantity = productQuantity;
 
