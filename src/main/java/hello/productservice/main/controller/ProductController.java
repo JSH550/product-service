@@ -132,7 +132,7 @@ public class ProductController {
 //        log.info("첫번째 파일 경로={}",productById.getProductImagesPath().get(0));
 //        log.info("첫번째 파일 경로={}",productById.getProductImagesPath().get(1));
         log.info("첫번째 파일 경로 ={}",productById.getProductImagesName().get(0));
-        log.info("첫번째 파일 경로 ={}",productById.getProductImagesName().get(1));
+//        log.info("첫번째 파일 경로 ={}",productById.getProductImagesName().get(1));
 
 
         //기능구현 1 - 첫번째 파일 이름 view에 전송
@@ -157,6 +157,38 @@ public class ProductController {
 
     };
 
+    /*/
+    상품 수정 기능
+     */
+    @GetMapping("/{id}/update")
+    public String showProductUpdateForm(@PathVariable Long id,
+                                            Model model){
+
+        //DB에서 Id로 상품 조회
+        ProductDto foundProductById = productService.findProductById(id);
+        //Model 정보 담아서 form에 전송, 수정form과 동일함
+        model.addAttribute("productDto",foundProductById);
+        model.addAttribute("productId",id);
+
+        log.info("productManufacturer={}",foundProductById.getProductManufacturer());
+
+        return "/product/product-updateform";
+
+    }
+
+    @PostMapping("/{id}/update")
+    public String updateProduct(@ModelAttribute ProductDto productDto,
+                                @PathVariable Long id,
+                                Model model){
+        //수정기능
+        productService.updateProductById(id,productDto);
+
+        //수정된 상품 객체에 저장
+        ProductDto productById = productService.findProductById(id);
+        //해당 product 상세 페이지로 이동
+        model.addAttribute(productById);
+        return "product/product-detail";
+    }
 
 
 
