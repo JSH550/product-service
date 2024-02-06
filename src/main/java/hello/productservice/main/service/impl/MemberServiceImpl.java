@@ -25,7 +25,9 @@ public class MemberServiceImpl implements MemberService {
     @Override
     public MemberDto saveMember(MemberDto memberDto) {
         Member member = new Member();
-        member.saveMember(memberDto.getMemberName(),
+        member.saveMember(
+                memberDto.getMemberEmail(),
+                memberDto.getMemberName(),
                 memberDto.getMemberPassword());
 //                memberDto.getMemberEmail(),
 //                memberDto.getMemberNickName());
@@ -58,13 +60,13 @@ public class MemberServiceImpl implements MemberService {
     };
 
     @Override
-    public Optional<MemberDto> login(String memberName, String password) {
+    public Optional<MemberDto> login(String memberEmail, String password) {
         try {
             //memberRepository에 의해서 DB에서 찾아진 값이 Optional<Member>로 꺼내진다
-            Member member = memberRepository.findByMemberName(memberName)
+//            Member member = memberRepository.findByMemberName(memberName)
+            Member member = memberRepository.findByMemberEmail(memberEmail)
                     .filter(foundMember -> foundMember.getMemberPassword().equals(password))
                     .orElseThrow(NoSuchFieldException::new);
-
             return Optional.of(convertToDto(member));
         } catch (NoSuchFieldException e) {
             log.info("로그인에러");
