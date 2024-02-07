@@ -24,4 +24,6 @@ public interface ProductService {
     Resource getProductFileByFileName(String fileName)  throws MalformedURLException;
 //    void deleteProductByName(String productName);
 
+    void updateProductById(Long productId, ProductDto productDto);
+
 }

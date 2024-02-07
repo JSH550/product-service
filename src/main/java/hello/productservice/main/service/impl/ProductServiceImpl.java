@@ -48,11 +48,13 @@ public class ProductServiceImpl implements ProductService {
         boolean isProductExist = productRepository.existsByProductName(productDto.getProductName());
 
         log.info("ExistResult={}",isProductExist);
+
         if (isProductExist){
             throw new IllegalArgumentException("이미 등록된 상품명입니다. 다른 상품명을 입력해주세요");
         }
         Product product = new Product();
         product.saveProduct(productDto.getProductName()
+                ,productDto.getProductManufacturer()
                 ,productDto.getProductPrice()
                 ,productDto.getProductQuantity());
         Product savedProduct = productRepository.save(product);
@@ -119,7 +121,10 @@ public class ProductServiceImpl implements ProductService {
     public ProductDto findProductById(Long productId) {
 
         Optional<Product> foundProduct = productRepository.findById(productId);
+
         if (foundProduct.isPresent()){
+
+            log.info("productManufacturer={}",foundProduct.get().getProductManufacturer());
 
             //productId에 관계된 이미지들 이름 전부 저장
             //productDto에는 List로 image 이름만 저장하자(id는 필요없음..)
@@ -127,13 +132,16 @@ public class ProductServiceImpl implements ProductService {
 
             //이름을 어떻게보낼건지?!
             //구현1번 imagename만저장, 컨트롤러에서 URL 만들기 복잡함..서비스계층에서 URL 만들어야함
-            List<String> productImageNames = new ArrayList<>();
-            List<ProductImage> productImages = foundProduct.get().getProductImages();
-            for (ProductImage productImage : productImages) {
-                //저장된 image들 이름 반복 돌면서 List에 저장
-                productImageNames.add(productImage.getProductImageName());
-                log.info("imageName={}",productImage.getProductImageName());
-            }
+//      ==============     메서드로 추출함========================
+//            List<String> productImageNames = new ArrayList<>();
+//            List<ProductImage> productImages = foundProduct.get().getProductImages();
+//            for (ProductImage productImage : productImages) {
+//                //저장된 image들 이름 반복 돌면서 List에 저장
+//                productImageNames.add(productImage.getProductImageName());
+//                log.info("imageName={}",productImage.getProductImageName());
+//            }
+
+            List<String> productImageNames = saveProductImagesToList(foundProduct);
 
 //            //구현2번 서비스계층에서 URL 만들어서 컨트롤러로 전달
 //
@@ -163,7 +171,19 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-
+    /*/
+       product에 mappin된 image들을 list에 저장
+     */
+    private static List<String> saveProductImagesToList(Optional<Product> foundProduct) {
+        List<String> productImageNames = new ArrayList<>();
+        List<ProductImage> productImages = foundProduct.get().getProductImages();
+        for (ProductImage productImage : productImages) {
+            //저장된 image들 이름 반복 돌면서 List에 저장
+            productImageNames.add(productImage.getProductImageName());
+            log.info("imageName={}",productImage.getProductImageName());
+        }
+        return productImageNames;
+    }
 
 
     @Override
@@ -185,6 +205,34 @@ public class ProductServiceImpl implements ProductService {
         return resource;
     }
 
+    /*/
+    상품 수정기능
+     */
+
+
+
+    @Transactional
+    public void updateProductById(Long productId, ProductDto productDto){
+        //productDto 수정할거 넘어오면
+        //DB에서 해당 제품이 실제로 있는지 조회하고
+        //있으면 수정해줘
+        Optional<Product> foundProduct = productRepository.findById(productId);
+        boolean isProductExist = productRepository.existsByProductName(productDto.getProductName());
+
+        if (!foundProduct.isPresent()){
+            throw new IllegalArgumentException("상품이 존재하지 않습니다 다시 확인해주세요");
+        }
+        if (isProductExist){
+            throw new IllegalArgumentException("이미 등록된 상품명입니다. 다른 상품명을 입력해주세요");
+        }else {
+            foundProduct.get().saveProduct(productDto.getProductName(),
+                    productDto.getProductManufacturer(),
+                    productDto.getProductPrice(),
+                    productDto.getProductQuantity());
+        }
+
+    }
+
 
     @Override
     public List<ProductDto> getAllProducts() {
@@ -193,8 +241,10 @@ public class ProductServiceImpl implements ProductService {
         //entity 값을 저장할 DTO List 객체 형성
         List<ProductDto> productDtos = new ArrayList<>();
         for (Product foundProduct : foundAllProducts)  {
-            ProductDto productDto = convertToDto(foundProduct);
+            List<String> productImages = saveProductImagesToList(Optional.of(foundProduct));
+            ProductDto productDto = convertToDtoWithFiles(foundProduct,productImages);
             productDtos.add(productDto);
+            log.info("productImage{}=",productImages.get(0));
         }
         return productDtos;
     }
@@ -218,6 +268,8 @@ public class ProductServiceImpl implements ProductService {
         return productDtos;
     }
 
+    //TODO productList 보여줄때 이미지파일1장이랑 제품이름 보여주기 기능
+
 
 
     ;
@@ -238,6 +290,7 @@ public class ProductServiceImpl implements ProductService {
     private ProductDto convertToDto(Product product) {
         ProductDto productDto = new ProductDto();
         productDto.setProductId(product.getProductId());
+        productDto.setProductManufacturer(product.getProductManufacturer());
         productDto.setProductName(product.getProductName());
         productDto.setProductPrice(product.getProductPrice());
         productDto.setProductQuantity(product.getProductQuantity());
@@ -253,6 +306,7 @@ public class ProductServiceImpl implements ProductService {
         ProductDto productDto = new ProductDto();
         productDto.setProductId(product.getProductId());
         productDto.setProductName(product.getProductName());
+        productDto.setProductManufacturer(product.getProductManufacturer());
         productDto.setProductPrice(product.getProductPrice());
         productDto.setProductQuantity(product.getProductQuantity());
         productDto.setProductImagesName(fileNames);
