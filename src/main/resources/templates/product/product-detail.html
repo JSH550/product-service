@@ -1,41 +1,90 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="../../static/css/main.css" rel="stylesheet">
     <link href="../css/main.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+
     <title>제품 상세 페이지</title>
 </head>
+
 <body>
- <div class="container">
+    
 
-    <h2 style="text-align: center" >제품 상세페이지입니다.</h2>
-     <div class="left-menu">
-         <P>상품사진:      <div th:each="imagePath : ${productDto.productImagesName}">
-         <img th:src="@{'/products/images/' + ${imagePath}}" alt="Product Image" width="100" height="100">
-     </div>
-         </div>
 
-    <div class="right-menu">
-    <p>상품명 : <span th:text="${productDto.productName}">등록된 상품이 아닙니다. </span></p>
-        <div style="outline: #0a58ca 1px">
-            <p>상품 가격 : <span th:text="${productDto.productPrice}">등록된 상품이 아닙니다. </span>원</p>
+        <h2 style="text-align: center">제품 상세페이지입니다.</h2>
+
+        <!-- 이미지 여러개 불러오기 -->
+        <!-- <div th:each="imagePath : ${productDto.productImagesName}" class="product-image-box">
+        <img th:src="@{'/products/images/' + ${imagePath}}" alt="Product Image" >
+    </div> -->
+    
+        <div class="product-detail-box">
+
+            <!-- 대표이미지 하나만 불러오기 -->
+            <div th:each="imagePath, iterStat : ${productDto.productImagesName}" class="product-image-box">
+                <img th:src="@{'/products/images/' + ${imagePath}}" alt="Product Image" th:if="${iterStat.index == 0}"
+                    class="margin-side-auto w-100">
+            </div>
+
+            <div class="product-detail-text">
+
+                <p style="font-size: 20px"><span th:text="${productDto.productManufacturer}">등록된 상품이 아닙니다. </span></p>
+
+                <p style="font-size: 18px"><span th:text="${productDto.productName}">등록된 상품이 아닙니다. </span></p>
+
+                <p style="font-size: 15px">상품 가격 : <span th:text="${productDto.productPrice}">등록된 상품이 아닙니다. </span> 원</p>
+
+                <p style="font-size: 15px">상품 수량 : <span th:text="${productDto.productQuantity}">등록된 상품이 아닙니다. </span>
+                </p>
+
+            </div>
         </div>
-    <p>상품 수량 : <span th:text="${productDto.productQuantity}">등록된 상품이 아닙니다. </span></p>
 
 
-   </P>
+
+
+
+
+
 
     </div>
 
 
 
+
+
+
+
+
+    </div>
+
+
+
+    </P>
+
+    <button type="button" class="button-click" style="background-color: grey"
+        onclick="moveToRelativeUrl('update')">상품수정</button>
+
     <h3>상품 관리</h3>
 
-</div>
+    </div>
 
-<script>
+    <script>
 
-</script>
+        //상대경로로 페이지 이동
+        const moveToRelativeUrl = (destinationUrl) => {
+            const currentUrl = window.location.href;
+            // const currentPath = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+            window.location.href = currentUrl + '/' + destinationUrl;
+        }
+
+
+    </script>
 </body>
+
 </html>
