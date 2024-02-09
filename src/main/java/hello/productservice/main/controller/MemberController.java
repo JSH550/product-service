@@ -1,7 +1,6 @@
 package hello.productservice.main.controller;
 
 import hello.productservice.main.data.dto.MemberDto;
-import hello.productservice.main.data.entity.Member;
 import hello.productservice.main.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,10 +10,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.HttpRequestHandler;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -39,8 +36,7 @@ public class MemberController {
     @GetMapping(value = "/signup")
     public String showSignup(Model model){
         model.addAttribute("memberDto",new MemberDto());
-        return "/member/signup3";
-
+        return "signup";
     };
 
     //회원가입
@@ -67,12 +63,12 @@ public class MemberController {
 
 
     @PostMapping("/login")
-    public String login(@RequestParam String memberName,
+    public String login(@RequestParam String memberEmail,
                         @RequestParam String password,
                         HttpServletResponse response,
                         HttpServletRequest request) {
 
-        Optional<MemberDto> loginMember = memberService.login(memberName, password);
+        Optional<MemberDto> loginMember = memberService.login(memberEmail, password);
         if (loginMember.isEmpty()==true){
             log.info("로그인 에러 검출");
             return "/member/loginForm";
@@ -93,7 +89,7 @@ public class MemberController {
 
     //(@SessionAttribute(name ="LOGIN_MEMBER",required = false session에 있는지 확인, 새로생성하진 않음
     @GetMapping("/mypage")
-    public String mypage(@SessionAttribute(name ="LOGIN_MEMBER",required = false) MemberDto loginMember
+    public String mypage(@SessionAttribute(name ="LOGIN_MEMBER",required = false) String loginMember
                         ,HttpServletRequest request,
                          Model model){
         if(loginMember==null){
