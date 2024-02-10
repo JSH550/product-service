@@ -61,15 +61,55 @@ public class ProductController {
         return "customError";
     }
 
+//    @GetMapping("")
+//    public String showProductList(Model model){
+//        List<ProductDto> productList = productService.getAllProducts();
+//        model.addAttribute("productList",productList);
+//        ProductDto productDto = productList.get(0);
+//        log.info(productDto.getProductName());
+////        return "/product/product-list";
+//        return "/product/product-list-new";
+//
+//    };
+
+//    @ResponseBody
     @GetMapping("")
-    public String showProductList(Model model){
-        List<ProductDto> productList = productService.getAllProducts();
-        model.addAttribute("productList",productList);
+    public String showProductListByPage(@RequestParam Integer pageNumber,
+                                        @RequestParam Integer listSize,
+                                        Model model){
+
+
+        // 클라이언트가 요청한 페이지 번호와 리스트 크기를 그대로 사용
+        // 단, 리스트 크기는 최소 4 최대 100으로 제한
+        if(pageNumber==null || pageNumber==0){
+            pageNumber=1;//페이지 번호가 null이거나 0일경우 기본값 1로 설정
+        }
+
+        if (listSize ==null || listSize==0 ){
+            listSize=4;//리스트 크기가 null이거나 0일경우 기본값 4로 설정
+        } else if (listSize >100) {
+            listSize=100;//리스트 크기가 100을 초과할경우 100으로 제한
+
+        }
+
+        List<ProductDto> productList = productService.findProducts(pageNumber, listSize);
+
+        model.addAttribute("productList", productList);
+        model.addAttribute("pageNumber",pageNumber);
+        model.addAttribute("listSize",listSize);
+
         ProductDto productDto = productList.get(0);
         log.info(productDto.getProductName());
-        return "/product/product-list";
-
+        return "/product/product-list-new2";
+//        log.info("pageNumber={}",pageNumber);
+//        log.info("listSize={}",listSize);
+//        return "ok";
     };
+
+
+
+
+
     /*/
     검색기능, 클라이언트가 검색어를 입력하면 query parameter로 받고 DB에서 Like로 조회
      */
