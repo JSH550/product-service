@@ -20,10 +20,14 @@ public interface ProductService {
 
    List<ProductDto> getAllProducts();
 
+   List<ProductDto> findProducts(Integer listSize, Integer pageNumber);
+
    List<ProductDto> searchProducts(String searchKeyword);
     Resource getProductFileByFileName(String fileName)  throws MalformedURLException;
 //    void deleteProductByName(String productName);
 
     void updateProductById(Long productId, ProductDto productDto);
+
+    int calculateMaxPageSize(Integer listSize);
 
 }

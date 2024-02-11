@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -45,13 +47,14 @@ public class ProductServiceImpl implements ProductService {
                                   List<MultipartFile> images) throws IOException {
 
         //DB에서 클라이언트가 입력한 productName 있는지 조회
-        boolean isProductExist = productRepository.existsByProductName(productDto.getProductName());
+//        boolean isProductExist = productRepository.existsByProductName(productDto.getProductName());
+//
+//        log.info("ExistResult={}",isProductExist);
+//
+//        if (isProductExist){
+//            throw new IllegalArgumentException("이미 등록된 상품명입니다. 다른 상품명을 입력해주세요");
+//        }
 
-        log.info("ExistResult={}",isProductExist);
-
-        if (isProductExist){
-            throw new IllegalArgumentException("이미 등록된 상품명입니다. 다른 상품명을 입력해주세요");
-        }
         Product product = new Product();
         product.saveProduct(productDto.getProductName()
                 ,productDto.getProductManufacturer()
@@ -209,8 +212,6 @@ public class ProductServiceImpl implements ProductService {
     상품 수정기능
      */
 
-
-
     @Transactional
     public void updateProductById(Long productId, ProductDto productDto){
         //productDto 수정할거 넘어오면
@@ -241,6 +242,7 @@ public class ProductServiceImpl implements ProductService {
         //entity 값을 저장할 DTO List 객체 형성
         List<ProductDto> productDtos = new ArrayList<>();
         for (Product foundProduct : foundAllProducts)  {
+//            product에 연관된 image들 이름 List에 저장
             List<String> productImages = saveProductImagesToList(Optional.of(foundProduct));
             ProductDto productDto = convertToDtoWithFiles(foundProduct,productImages);
             productDtos.add(productDto);
@@ -248,6 +250,51 @@ public class ProductServiceImpl implements ProductService {
         }
         return productDtos;
     }
+
+
+    /*/
+    클라이언트가 요청한 갯수만큼의 아이템정보 전송
+     */
+
+    public List<ProductDto> findProducts(Integer pageNumber,Integer listSize){
+
+//        listSize가 0이거나 null 이면 4저장(default)
+        if(listSize==null||listSize==0){
+            listSize=4;
+        }
+
+//        몇page에 몇개의 품목을 보여줄지 객체에 저장
+        PageRequest pageRequest = PageRequest.of(pageNumber, listSize);
+
+        //DB에서 결과 조회, List에 저장
+        List<Product> foundProducts = productRepository.findAll(pageRequest).getContent();
+
+//        List에 저장
+        List<ProductDto> productDtos = new ArrayList<>();
+        for (Product foundProduct : foundProducts) {
+            //            product에 연관된 image들 이름 List에 저장
+            List<String> productImages = saveProductImagesToList(Optional.ofNullable(foundProduct));
+            ProductDto productDto = convertToDtoWithFiles(foundProduct, productImages);
+            productDtos.add(productDto);
+            log.info("productImage{}=",productImages.get(0));
+        }
+        return productDtos;
+//        resturn해서 정보전송
+
+    }
+
+
+    public int calculateMaxPageSize(Integer listSize){
+
+//        product table 의 total data 수 조회 객체에 저장
+        long countTotalData =  productRepository.count();
+        int maxPageSize = (int) Math.ceil(countTotalData/listSize);//나눈값을 올림처리하여 정수로 만듬
+
+        return maxPageSize;
+
+
+    }
+
 
     /*
     검색기능
