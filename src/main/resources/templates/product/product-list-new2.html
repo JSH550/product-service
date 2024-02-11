@@ -28,7 +28,8 @@
     <div class="container">
         <div class="row d-flex w-100 ">
             <div id="content-container" class="col-3 product-info-box" th:each="product : ${productList}">
-                <div class="product-info-img">
+                <!-- img div의 id는 productId값 저장 -->
+                <div class="product-info-img" th:id=" ${product.productId}">
                     <!-- 대표이미지 하나만 가져오기  -->
                     <img th:src="@{'/products/images/' + ${product.productImagesName[0]}}" alt="Product Image"
                         class="w-100">
@@ -46,42 +47,105 @@
             </div>
         </div>
 
+  
 
         <!-- 중앙배치 페이지 네비게이션 -->
         <nav aria-label="Page navigation" style="justify-content: center;" class="d-flex">
             <ul class="pagination">
-              <li class="page-item"><a class="page-number" href="#">Previous</a></li>
-              <li class="page-item"><a class="page-number" href="#">1</a></li>
-              <li class="page-item"><a class="page-number" href="#">2</a></li>
-              <li class="page-item"><a class="page-number" href="#">3</a></li>
-              <li class="page-item"><a class="page-number" href="#">4</a></li>
-              <li class="page-item"><a class="page-number" href="#">5</a></li>
-              <li class="page-item"><a class="page-number" href="#">Next</a></li>
+                <!-- 현재 페이지 번호가 3보다 작으면 Previous 버튼 숨김 -->
+                <li class="page-item" id="previous-button">
+                    <a class="page-number page-link" href="#">Previous</a>
+                </li>
+                <!-- 현재 페이지 번호가 중앙에 오도록 페이지 네비게이션 형성, maxpagelist보다 큰 버튼은 만들지 않음-->
+                <li class="page-item" th:each="i:${#numbers.sequence((pageNumber>3 ? 0:1),(pageNumber>3 ? 4:5))}"
+                    th:if="${pageNumber + i - 2 <= maxPageSize}"><a class="page-number page-link" href="#"
+                        th:text="${(pageNumber>3 ? pageNumber + i -2 :i)}"></a>
+                </li>
+                <!-- 현재 페이지 번호가 최대 페이지 번호-5 보다 작으면 Next 버튼 숨김  -->
+                <li class="page-item" id="next-button">
+                    <a class="page-number page-link" href="#">Next</a>
+                </li>
             </ul>
-          </nav>
+        </nav>
     </div>
 
-<script>
+    <script th:inline="javascript">
+        let pageNumbers = document.querySelectorAll('.page-number');
+        let nowPageUrlWithoutQueryParams = window.location.href.split('?')[0];
+        let nowPageNumber = /*[[${pageNumber}]]*/ 1;
+        let maxPageSize = /*[[${maxPageSize}]]*/ 1;
 
-let pageNumbers = document.querySelectorAll('.page-number');
+        console.log('페이지번호=' + nowPageNumber)
 
-pageNumbers.forEach(function(number){
-    number.addEventListener('click',function(e){
-    const clickNumber=e.target.textContent;    
-        console.log('클릭감지'+e.target.textContent)
-        console.log(window.location.pathname);
-    const nowPageUrl= window.location.href;
-
-        window.location.href =  nowPageUrl+"?pageNumber="+clickNumber;
-
+        pageNumbers.forEach(function (number) {
+            number.addEventListener('click', function (e) {
+                let clickNumber = e.target.textContent;//int 형태로 변환
 
 
-    })})
+                if (clickNumber == 'Previous') {
+                    if (nowPageNumber <= 5) {
+                        clickNumber = 1
+                    } else {
+                        clickNumber = nowPageNumber - 5;
+                    }
+                } else if (clickNumber == 'Next') {
+                    if (maxPageSize - nowPageNumber <= 5) {
+                        clickNumber = maxPageSize;
+
+                    } else {
+                        clickNumber = nowPageNumber + 5;
+
+
+                    }
+                } else {
+                    parseInt(clickNumber)
+                }
+
+                console.log('클릭감지' + e.target.textContent)
+                console.log(window.location.pathname);
+
+                // const currentPath = currentUrl.substring(0, currentUrl.lastIndexOf('/') + 1);
+
+
+                window.location.href = nowPageUrlWithoutQueryParams + "?pageNumber=" + clickNumber;
+            })
+        })
 
 
 
 
-</script>
+        // Previous, Next 버튼 숨기기 기능
+        if (nowPageNumber < 3) {
+            document.querySelector('#previous-button').style.visibility = 'hidden';
+        }
+
+        if (nowPageNumber >= (maxPageSize - 3)) {
+            document.querySelector('#next-button').style.visibility = 'hidden';
+
+
+        }
+
+
+        // 이미지 클릭시 해당 상품으로 이동 기능
+        let productImageBoxes = document.querySelectorAll('.product-info-img')
+        productImageBoxes.forEach(function (imageBox) {
+            imageBox.addEventListener('click', function (event) {
+                //클릭한 상품의 id값 객체에 저장
+                let productId = imageBox.id;
+
+                console.log('이미지 클릭 감지' + productId)
+                
+                //productId를 바탕으로 상세페이지로 이동
+                window.location.href = nowPageUrlWithoutQueryParams +'/'+productId
+
+            })
+
+
+        })
+
+
+
+    </script>
 
 
 </body>
