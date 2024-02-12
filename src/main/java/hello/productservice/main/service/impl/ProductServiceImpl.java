@@ -31,6 +31,8 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
     private final ProductImageRepository productImageRepository;
+    @Value("${file.dir}")
+    private String uploadDirectory;
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository, ProductImageRepository productImageRepository) {
@@ -38,8 +40,20 @@ public class ProductServiceImpl implements ProductService {
         this.productImageRepository = productImageRepository;
     }
 
-    @Value("${file.dir}")
-    private String uploadDirectory;
+    /*/
+       product에 mappin된 image들을 list에 저장
+     */
+    private static List<String> saveProductImagesToList(Optional<Product> foundProduct) {
+        List<String> productImageNames = new ArrayList<>();
+        List<ProductImage> productImages = foundProduct.get().getProductImages();
+        for (ProductImage productImage : productImages) {
+            //저장된 image들 이름 반복 돌면서 List에 저장
+            productImageNames.add(productImage.getProductImageName());
+            log.info("imageName={}", productImage.getProductImageName());
+        }
+        return productImageNames;
+    }
+
     //TODO 제조사 정보 추가
     @Override
     @Transactional
@@ -57,21 +71,22 @@ public class ProductServiceImpl implements ProductService {
 
         Product product = new Product();
         product.saveProduct(productDto.getProductName()
-                ,productDto.getProductManufacturer()
-                ,productDto.getProductPrice()
-                ,productDto.getProductQuantity());
+                , productDto.getProductManufacturer()
+                , productDto.getProductPrice()
+                , productDto.getProductQuantity());
         Product savedProduct = productRepository.save(product);
 
         //이미지 저장
-        if (images !=null && !images.isEmpty()){
-            saveAttachedFiles(images,savedProduct);
+        if (images != null && !images.isEmpty()) {
+            saveAttachedFiles(images, savedProduct);
         }
 
         ProductDto savedProductDto = convertToDto(product);
         return savedProductDto;
     }
+
     private void saveAttachedFiles(List<MultipartFile> images, Product product) throws IOException {
-        for(MultipartFile file : images){
+        for (MultipartFile file : images) {
 
             //UUID + filename 으로 고유 filename 형성
             String savedFileName = createFileName(file);
@@ -84,37 +99,39 @@ public class ProductServiceImpl implements ProductService {
 //            Path filePath = Paths.get(savedFilePath);
 //            //file 저장
 //            Files.write(filePath, fileData);
-            productImageRepository.saveImage(file.getBytes(),savedFilePath);
+            productImageRepository.saveImage(file.getBytes(), savedFilePath);
 
-            log.info("saveFileName={}",savedFileName);
+            log.info("saveFileName={}", savedFileName);
             //productFile entity 정보 저장
             ProductImage productImage = new ProductImage();
-            productImage.saveProductImage(product,savedFileName);
+            productImage.saveProductImage(product, savedFileName);
             product.getProductImages().add(productImage);
         }
 
     }
+
     /*
       UUID + filename으로 고유 filename 형성 메서드
      */
     private String createFileName(MultipartFile file) {
         String ext = extractExt(file);
         String originalFilename = file.getOriginalFilename();
-        return UUID.randomUUID().toString() +
+        return UUID.randomUUID() +
                 "_" + originalFilename.substring(0, originalFilename.lastIndexOf(".")) +
-                "."+ ext;
+                "." + ext;
     }
+
     /*/
     filename에서 확장자(ext)추출 메서드
      */
-    private String extractExt(MultipartFile file){
+    private String extractExt(MultipartFile file) {
         String originalFilename = file.getOriginalFilename();
         //확장자는 .확장자 형태, 마지막으로 .문자 index를 변수로 추출
         int extStartPosition = originalFilename.lastIndexOf(".");
         //확장자 추출하여 반환
-        if (extStartPosition >=0 ){
-            return file.getOriginalFilename().substring(extStartPosition+1);
-        }else{
+        if (extStartPosition >= 0) {
+            return file.getOriginalFilename().substring(extStartPosition + 1);
+        } else {
             throw new IllegalArgumentException("파일에 확장자가 없습니다.");
         }
 
@@ -125,9 +142,9 @@ public class ProductServiceImpl implements ProductService {
 
         Optional<Product> foundProduct = productRepository.findById(productId);
 
-        if (foundProduct.isPresent()){
+        if (foundProduct.isPresent()) {
 
-            log.info("productManufacturer={}",foundProduct.get().getProductManufacturer());
+            log.info("productManufacturer={}", foundProduct.get().getProductManufacturer());
 
             //productId에 관계된 이미지들 이름 전부 저장
             //productDto에는 List로 image 이름만 저장하자(id는 필요없음..)
@@ -162,10 +179,10 @@ public class ProductServiceImpl implements ProductService {
 //            log.info("productIamge={}",foundProduct.get().getProductImages().get(0).getProductImageName());
 //            return convertToDtoWithFiles(foundProduct.get(),foundProductImagesPaths);
 
-            return convertToDtoWithFiles(foundProduct.get(),productImageNames);
+            return convertToDtoWithFiles(foundProduct.get(), productImageNames);
 
 
-        }else {
+        } else {
             throw new NoSuchElementException("Product not found with ID: " + productId);
         }
 
@@ -174,27 +191,12 @@ public class ProductServiceImpl implements ProductService {
 
     }
 
-    /*/
-       product에 mappin된 image들을 list에 저장
-     */
-    private static List<String> saveProductImagesToList(Optional<Product> foundProduct) {
-        List<String> productImageNames = new ArrayList<>();
-        List<ProductImage> productImages = foundProduct.get().getProductImages();
-        for (ProductImage productImage : productImages) {
-            //저장된 image들 이름 반복 돌면서 List에 저장
-            productImageNames.add(productImage.getProductImageName());
-            log.info("imageName={}",productImage.getProductImageName());
-        }
-        return productImageNames;
-    }
-
-
     @Override
     public Optional<ProductDto> findProductByName(String productName) {
 
         Optional<Product> foundProductByName = productRepository.findByProductName(productName);
 
-        return Optional.ofNullable(convertToDto(foundProductByName.get())) ;
+        return Optional.ofNullable(convertToDto(foundProductByName.get()));
 
 //        if (foundProductByName.isPresent()){
 //            return Optional.ofNullable(convertToDto(foundProductByName.get())) ;
@@ -202,9 +204,10 @@ public class ProductServiceImpl implements ProductService {
 //            throw new NoSuchElementException("Product not found with name: " + productName);
 //        }
     }
+
     //filename으로 스토리지에서 file 가져와서 return하는 기능
     public Resource getProductFileByFileName(String fileName) throws MalformedURLException {
-        UrlResource resource = new UrlResource("file:"+ uploadDirectory+fileName);
+        UrlResource resource = new UrlResource("file:" + uploadDirectory + fileName);
         return resource;
     }
 
@@ -213,19 +216,19 @@ public class ProductServiceImpl implements ProductService {
      */
 
     @Transactional
-    public void updateProductById(Long productId, ProductDto productDto){
+    public void updateProductById(Long productId, ProductDto productDto) {
         //productDto 수정할거 넘어오면
         //DB에서 해당 제품이 실제로 있는지 조회하고
         //있으면 수정해줘
         Optional<Product> foundProduct = productRepository.findById(productId);
         boolean isProductExist = productRepository.existsByProductName(productDto.getProductName());
 
-        if (!foundProduct.isPresent()){
+        if (!foundProduct.isPresent()) {
             throw new IllegalArgumentException("상품이 존재하지 않습니다 다시 확인해주세요");
         }
-        if (isProductExist){
+        if (isProductExist) {
             throw new IllegalArgumentException("이미 등록된 상품명입니다. 다른 상품명을 입력해주세요");
-        }else {
+        } else {
             foundProduct.get().saveProduct(productDto.getProductName(),
                     productDto.getProductManufacturer(),
                     productDto.getProductPrice(),
@@ -241,12 +244,12 @@ public class ProductServiceImpl implements ProductService {
         List<Product> foundAllProducts = productRepository.findAll();
         //entity 값을 저장할 DTO List 객체 형성
         List<ProductDto> productDtos = new ArrayList<>();
-        for (Product foundProduct : foundAllProducts)  {
+        for (Product foundProduct : foundAllProducts) {
 //            product에 연관된 image들 이름 List에 저장
             List<String> productImages = saveProductImagesToList(Optional.of(foundProduct));
-            ProductDto productDto = convertToDtoWithFiles(foundProduct,productImages);
+            ProductDto productDto = convertToDtoWithFiles(foundProduct, productImages);
             productDtos.add(productDto);
-            log.info("productImage{}=",productImages.get(0));
+            log.info("productImage{}=", productImages.get(0));
         }
         return productDtos;
     }
@@ -256,43 +259,67 @@ public class ProductServiceImpl implements ProductService {
     클라이언트가 요청한 갯수만큼의 아이템정보 전송
      */
 
-    public List<ProductDto> findProducts(Integer pageNumber,Integer listSize){
-
-//        listSize가 0이거나 null 이면 4저장(default)
-        if(listSize==null||listSize==0){
-            listSize=4;
-        }
-
-//        몇page에 몇개의 품목을 보여줄지 객체에 저장
+    @Override
+    @Transactional
+    public List<ProductDto> findProducts(Integer pageNumber, Integer listSize) {
+        //pageNumber listSize PageRequest 객체에 저장
         PageRequest pageRequest = PageRequest.of(pageNumber, listSize);
-
-        //DB에서 결과 조회, List에 저장
+        //DB에서 조회한 결과를 Product entity 형태로 list에 저장
         List<Product> foundProducts = productRepository.findAll(pageRequest).getContent();
-
-//        List에 저장
+        //controller로 반환하기 위한 ProductDto list 형성
         List<ProductDto> productDtos = new ArrayList<>();
+        //productDto에 product 정보와 image이름들 저장하여 저장
         for (Product foundProduct : foundProducts) {
-            //            product에 연관된 image들 이름 List에 저장
+            //product에 연관된 image들 이름 List에 저장
             List<String> productImages = saveProductImagesToList(Optional.ofNullable(foundProduct));
             ProductDto productDto = convertToDtoWithFiles(foundProduct, productImages);
             productDtos.add(productDto);
-            log.info("productImage{}=",productImages.get(0));
+            log.info("productImage{}=", productImages.get(0));
         }
         return productDtos;
-//        resturn해서 정보전송
+    };
 
+
+//   메서드 오버로딩으로 검색어가 입력되었을경우 제품 찾는기능
+    @Override
+    @Transactional
+    public List<ProductDto> findProducts(Integer pageNumber, Integer listSize, String searchKeyword) {
+        //pageNumber listSize PageRequest 객체에 저장
+        PageRequest pageRequest = PageRequest.of(pageNumber, listSize);
+
+        List<Product> searchedProducts = productRepository.findByProductNameContaining(searchKeyword,pageRequest);
+        //entity 값을 저장할 DTO List 객체 형성
+        if (searchedProducts.isEmpty()) {
+            throw new NoSuchElementException("검색 결과가 존재하지 않습니다. 검색어 :  " + searchKeyword);
+        }
+        log.info("result={}", searchedProducts.get(0).getProductName());
+        //controller로 반환하기 위한 ProductDto list 형성
+        List<ProductDto> productDtos = new ArrayList<>();
+        //productDto에 product 정보와 image이름들 저장하여 저장
+        for (Product foundProduct : searchedProducts) {
+            //product에 연관된 image들 이름 List에 저장
+            List<String> productImages = saveProductImagesToList(Optional.ofNullable(foundProduct));
+            ProductDto productDto = convertToDtoWithFiles(foundProduct, productImages);
+            productDtos.add(productDto);
+            log.info("productImage{}=", productImages.get(0));
+        }
+        return productDtos;
+    };
+
+
+    public int calculateMaxPageSize(Integer listSize) {
+//        product table 의 total data 수 조회 객체에 저장
+        long countTotalData = productRepository.count();
+        int maxPageSize = (int) Math.ceil(countTotalData / listSize);//나눈값을 올림처리하여 정수로 만듬
+        return maxPageSize;
     }
 
-
-    public int calculateMaxPageSize(Integer listSize){
-
+    public int calculateMaxPageSize(Integer listSize, String searchKeyword) {
+        long countTotalData = productRepository.countByProductNameContaining(searchKeyword);
 //        product table 의 total data 수 조회 객체에 저장
-        long countTotalData =  productRepository.count();
-        int maxPageSize = (int) Math.ceil(countTotalData/listSize);//나눈값을 올림처리하여 정수로 만듬
-
+        log.info("totalData={}",countTotalData);
+        int maxPageSize = (int) Math.ceil(countTotalData / listSize);//나눈값을 올림처리하여 정수로 만듬
         return maxPageSize;
-
-
     }
 
 
@@ -300,16 +327,18 @@ public class ProductServiceImpl implements ProductService {
     검색기능
      */
     @Override
+    @Transactional
+
     public List<ProductDto> searchProducts(String searchKeyword) {
         //DB에서 검색결과 List 저장
         List<Product> searchedProducts = productRepository.findByProductNameContaining(searchKeyword);
         //entity 값을 저장할 DTO List 객체 형성
-        if(searchedProducts.isEmpty()){
+        if (searchedProducts.isEmpty()) {
             throw new NoSuchElementException("검색 결과가 존재하지 않습니다. 검색어 :  " + searchKeyword);
         }
         List<ProductDto> productDtos = new ArrayList<>();
-        for(Product searchedProduct : searchedProducts ){
-            ProductDto productDto= convertToDto(searchedProduct);
+        for (Product searchedProduct : searchedProducts) {
+            ProductDto productDto = convertToDto(searchedProduct);
             productDtos.add(productDto);
         }
         return productDtos;
@@ -318,10 +347,7 @@ public class ProductServiceImpl implements ProductService {
     //TODO productList 보여줄때 이미지파일1장이랑 제품이름 보여주기 기능
 
 
-
-    ;
-
-//    @Override
+    //    @Override
 //    public void deleteProductByName(String productName) {
 //        Optional<Product> foundProduct = productRepository.findByProductName(productName);
 //        if (foundProduct.isPresent()) {
@@ -361,8 +387,6 @@ public class ProductServiceImpl implements ProductService {
 //        memberDto.setMemberNickName(member.getMemberNickName());
         return productDto;
     }
-
-
 
 
 }

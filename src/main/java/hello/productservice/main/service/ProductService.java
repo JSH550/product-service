@@ -14,20 +14,16 @@ public interface ProductService {
                            List<MultipartFile> imagesList) throws IOException;
 
     ProductDto findProductById(Long productId);
-
     Optional<ProductDto> findProductByName(String productName);
-
-
    List<ProductDto> getAllProducts();
-
-   List<ProductDto> findProducts(Integer listSize, Integer pageNumber);
-
    List<ProductDto> searchProducts(String searchKeyword);
     Resource getProductFileByFileName(String fileName)  throws MalformedURLException;
 //    void deleteProductByName(String productName);
-
     void updateProductById(Long productId, ProductDto productDto);
-
+    List<ProductDto> findProducts(Integer pageNumber, Integer listSize);
+    List<ProductDto> findProducts(Integer pageNumber, Integer listSize, String searchKeyword);
     int calculateMaxPageSize(Integer listSize);
+
+    int calculateMaxPageSize(Integer listSize, String searchKeyword);
 
 }
