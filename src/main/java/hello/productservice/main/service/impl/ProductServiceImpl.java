@@ -1,6 +1,7 @@
 package hello.productservice.main.service.impl;
 
 import hello.productservice.main.data.dto.ProductDto;
+import hello.productservice.main.data.dto.ProductSaveDto;
 import hello.productservice.main.data.entity.product.Product;
 import hello.productservice.main.data.entity.product.ProductImage;
 import hello.productservice.main.repository.ProductImageRepository;
@@ -57,7 +58,7 @@ public class ProductServiceImpl implements ProductService {
     //TODO 제조사 정보 추가
     @Override
     @Transactional
-    public ProductDto saveProduct(ProductDto productDto,
+    public ProductDto saveProduct(ProductSaveDto productDto,
                                   List<MultipartFile> images) throws IOException {
 
         //DB에서 클라이언트가 입력한 productName 있는지 조회
@@ -72,8 +73,8 @@ public class ProductServiceImpl implements ProductService {
         Product product = new Product();
         product.saveProduct(productDto.getProductName()
                 , productDto.getProductManufacturer()
-                , productDto.getProductPrice()
-                , productDto.getProductQuantity());
+                , productDto.getProductPrice());
+//                , productDto.getProductQuantity());
         Product savedProduct = productRepository.save(product);
 
         //이미지 저장
@@ -231,8 +232,8 @@ public class ProductServiceImpl implements ProductService {
         } else {
             foundProduct.get().saveProduct(productDto.getProductName(),
                     productDto.getProductManufacturer(),
-                    productDto.getProductPrice(),
-                    productDto.getProductQuantity());
+                    productDto.getProductPrice());
+//                    productDto.getProductQuantity());
         }
 
     }
@@ -366,22 +367,33 @@ public class ProductServiceImpl implements ProductService {
         productDto.setProductManufacturer(product.getProductManufacturer());
         productDto.setProductName(product.getProductName());
         productDto.setProductPrice(product.getProductPrice());
-        productDto.setProductQuantity(product.getProductQuantity());
-//        memberDto.setMemberEmail(member.getMemberEmail());
-//        memberDto.setMemberNickName(member.getMemberNickName());
+//        productDto.setProductQuantity(product.getProductQuantity());
+
         return productDto;
     }
 
     /*/
     첨부 file이 있는 product에서 사용, file들 이름 받아와서 Dto에 저장
      */
+//    private ProductDto convertToDtoWithFiles(Product product, List<String> fileNames) {
+//        ProductDto productDto = new ProductDto();
+//        productDto.setProductId(product.getProductId());
+//        productDto.setProductName(product.getProductName());
+//        productDto.setProductManufacturer(product.getProductManufacturer());
+//        productDto.setProductPrice(product.getProductPrice());
+//        productDto.setProductQuantity(product.getProductQuantity());
+//        productDto.setProductImagesName(fileNames);
+////        memberDto.setMemberEmail(member.getMemberEmail());
+////        memberDto.setMemberNickName(member.getMemberNickName());
+//        return productDto;
+//    }
+
     private ProductDto convertToDtoWithFiles(Product product, List<String> fileNames) {
         ProductDto productDto = new ProductDto();
         productDto.setProductId(product.getProductId());
         productDto.setProductName(product.getProductName());
         productDto.setProductManufacturer(product.getProductManufacturer());
         productDto.setProductPrice(product.getProductPrice());
-        productDto.setProductQuantity(product.getProductQuantity());
         productDto.setProductImagesName(fileNames);
 //        memberDto.setMemberEmail(member.getMemberEmail());
 //        memberDto.setMemberNickName(member.getMemberNickName());

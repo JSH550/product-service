@@ -1,6 +1,7 @@
 package hello.productservice.main.service;
 
 import hello.productservice.main.data.dto.ProductDto;
+import hello.productservice.main.data.dto.ProductSaveDto;
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ProductService {
-    ProductDto saveProduct(ProductDto productDto,
+    ProductDto saveProduct(ProductSaveDto productSaveDto,
                            List<MultipartFile> imagesList) throws IOException;
 
     ProductDto findProductById(Long productId);
