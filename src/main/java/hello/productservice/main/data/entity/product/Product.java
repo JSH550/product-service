@@ -18,8 +18,8 @@ public class Product {
 
     private String productName;
     private String productManufacturer;
-    private double productPrice;
-    private int productQuantity;
+    private int productPrice;
+//    private int productQuantity;
 
 //    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product")
 //    //컬렉션을 초기화 해주지 않으면 NullPointException발생
@@ -30,11 +30,19 @@ public class Product {
     private List<ProductImage> productImages = new ArrayList<>();
 
 
-    public void saveProduct(String productName,String productManufacturer, double productPrice, int productQuantity) {
+//    public void saveProduct(String productName,String productManufacturer, double productPrice, int productQuantity) {
+//        this.productName = productName;
+//        this.productManufacturer = productManufacturer;
+//        this.productPrice = productPrice;
+//        this.productQuantity = productQuantity;
+//
+//    }
+
+
+    public void saveProduct(String productName,String productManufacturer, int productPrice) {
         this.productName = productName;
         this.productManufacturer = productManufacturer;
         this.productPrice = productPrice;
-        this.productQuantity = productQuantity;
 
     }
 }
