@@ -30,6 +30,11 @@ public class Product {
     private List<ProductImage> productImages = new ArrayList<>();
 
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "product", fetch = FetchType.LAZY)
+    private List<ProductCategory> productCategories = new ArrayList<>();
+
+
+
 //    public void saveProduct(String productName,String productManufacturer, double productPrice, int productQuantity) {
 //        this.productName = productName;
 //        this.productManufacturer = productManufacturer;
@@ -37,6 +42,8 @@ public class Product {
 //        this.productQuantity = productQuantity;
 //
 //    }
+
+
 
 
     public void saveProduct(String productName,String productManufacturer, int productPrice) {
